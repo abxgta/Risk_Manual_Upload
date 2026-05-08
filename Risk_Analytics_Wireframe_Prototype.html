@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Risk Analytics KRI Platform - Interactive Wireframe Prototype</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg-deep: #0b1020;
+  --bg-panel: #ffffff;
+  --bg-soft: #f5f7fb;
+  --bg-sidebar: #111a36;
+  --primary: #2563eb;
+  --primary-2: #1e40af;
+  --accent: #06b6d4;
+  --green: #10b981;
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-400: #9ca3af;
+  --gray-600: #4b5563;
+  --gray-800: #1f2937;
+  --shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 12px 36px rgba(15, 23, 42, 0.16);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+html, body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg-soft);
+  color: var(--gray-800);
+  height: 100%;
+  overflow-x: hidden;
+}
+.app { display: flex; min-height: 100vh; }
+
+/* ---------- SIDEBAR ---------- */
+.sidebar {
+  width: 240px;
+  background: linear-gradient(180deg, #0f172a 0%, #1e3a8a 100%);
+  color: #e2e8f0;
+  display: flex; flex-direction: column;
+  padding: 22px 0;
+  position: fixed; top: 0; left: 0; bottom: 0;
+}
+.brand {
+  padding: 0 22px 22px 22px;
+  display: flex; align-items: center; gap: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.brand-mark {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: linear-gradient(135deg, #06b6d4, #2563eb);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; color: white;
+}
+.brand-name { font-weight: 700; font-size: 15px; letter-spacing: 0.3px; }
+.brand-sub { font-size: 11px; color: #94a3b8; }
+.nav { padding: 16px 0; flex: 1; }
+.nav-section {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+  color: #94a3b8; padding: 12px 22px 6px; font-weight: 600;
+}
+.nav-item {
+  padding: 10px 22px;
+  font-size: 13.5px;
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: background 0.15s, border-color 0.15s;
+}
+.nav-item:hover { background: rgba(255,255,255,0.05); }
+.nav-item.active { background: rgba(37,99,235,0.18); border-left-color: var(--accent); color: white; }
+.nav-icon { width: 18px; opacity: 0.9; }
+.user-card {
+  margin: 0 16px;
+  padding: 12px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 12px;
+}
+.avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; color: white; font-size: 13px;
+}
+
+/* ---------- MAIN ---------- */
+.main {
+  margin-left: 240px;
+  flex: 1;
+  display: flex; flex-direction: column;
+  min-height: 100vh;
+}
+.topbar {
+  background: white;
+  height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 30px;
+  box-shadow: var(--shadow);
+  position: sticky; top: 0; z-index: 50;
+}
+.crumbs { font-size: 13px; color: var(--gray-600); }
+.crumbs strong { color: var(--gray-800); }
+.topbar-actions { display: flex; gap: 12px; align-items: center; }
+.search-box {
+  background: var(--gray-100); border: 0; padding: 8px 14px;
+  border-radius: 20px; width: 280px; font-size: 13px;
+}
+.icon-btn {
+  width: 36px; height: 36px; border-radius: 50%; border: 0;
+  background: var(--gray-100); cursor: pointer; position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+.icon-btn:hover { background: var(--gray-200); }
+.notif-dot {
+  position: absolute; top: 6px; right: 6px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--red);
+}
+
+.content { padding: 26px 30px; flex: 1; }
+
+/* ---------- PAGE ANIMATIONS ---------- */
+.page { display: none; animation: fadeIn 0.4s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideRight { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+  50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+}
+@keyframes flow {
+  0% { stroke-dashoffset: 100; }
+  100% { stroke-dashoffset: 0; }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes growBar { from { height: 0; } }
+
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.page-title { font-size: 22px; font-weight: 700; color: var(--gray-800); }
+.page-sub { font-size: 13px; color: var(--gray-600); margin-top: 4px; }
+
+.tabs { display: flex; gap: 6px; background: white; padding: 6px; border-radius: 10px; box-shadow: var(--shadow); width: fit-content; margin-bottom: 22px; }
+.tab {
+  padding: 8px 18px; font-size: 13px; font-weight: 500;
+  border-radius: 6px; cursor: pointer; color: var(--gray-600);
+  transition: all 0.2s;
+}
+.tab:hover { color: var(--gray-800); }
+.tab.active { background: var(--primary); color: white; }
+
+/* ---------- KRI TILES ---------- */
+.kri-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.kri-tile {
+  background: white; border-radius: var(--radius);
+  padding: 18px; box-shadow: var(--shadow);
+  position: relative; overflow: hidden; cursor: pointer;
+  transition: transform 0.18s, box-shadow 0.18s;
+  animation: fadeIn 0.5s ease backwards;
+}
+.kri-tile:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.kri-tile::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+}
+.kri-tile.green::before { background: var(--green); }
+.kri-tile.amber::before { background: var(--amber); }
+.kri-tile.red::before { background: var(--red); }
+.kri-tile.inactive { opacity: 0.55; }
+.kri-tile.inactive::before { background: var(--gray-400); }
+
+.kri-head { display: flex; justify-content: space-between; align-items: flex-start; }
+.kri-name { font-size: 13px; font-weight: 600; color: var(--gray-800); margin-right: 8px; }
+.kri-status {
+  font-size: 10.5px; font-weight: 700; padding: 4px 8px; border-radius: 12px;
+  text-transform: uppercase; letter-spacing: 0.4px;
+}
+.kri-status.green { background: rgba(16,185,129,0.12); color: var(--green); }
+.kri-status.amber { background: rgba(245,158,11,0.14); color: var(--amber); }
+.kri-status.red { background: rgba(239,68,68,0.12); color: var(--red); animation: pulse 2.5s infinite; }
+.kri-status.inactive { background: var(--gray-200); color: var(--gray-600); }
+.kri-value { font-size: 28px; font-weight: 700; margin: 14px 0 4px; color: var(--gray-800); }
+.kri-trend { font-size: 11.5px; color: var(--gray-600); }
+.kri-trend.up { color: var(--red); }
+.kri-trend.down { color: var(--green); }
+.kri-spark { height: 38px; margin-top: 8px; }
+.kri-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--gray-400); margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--gray-100); }
+.manual-badge {
+  display: inline-block; font-size: 9.5px; padding: 2px 6px; border-radius: 4px;
+  background: rgba(6, 182, 212, 0.15); color: #0e7490; font-weight: 600;
+  margin-left: 6px;
+}
+
+/* ---------- BUTTONS ---------- */
+.btn {
+  border: 0; padding: 10px 18px; border-radius: 8px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: all 0.18s; text-decoration: none;
+}
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { background: var(--primary-2); transform: translateY(-1px); }
+.btn-ghost { background: white; color: var(--gray-800); border: 1px solid var(--gray-200); }
+.btn-ghost:hover { background: var(--gray-100); }
+.btn-success { background: var(--green); color: white; }
+.btn-success:hover { background: #059669; }
+.btn-warn { background: var(--amber); color: white; }
+
+/* ---------- DOMAIN HEADER STRIP ---------- */
+.domain-strip {
+  background: linear-gradient(135deg, #1e3a8a, #0e7490);
+  color: white; padding: 18px 22px; border-radius: var(--radius);
+  margin-bottom: 22px; display: flex; justify-content: space-between; align-items: center;
+}
+.domain-strip h2 { font-size: 18px; }
+.domain-strip .desc { font-size: 12.5px; opacity: 0.85; margin-top: 4px; }
+.domain-stats { display: flex; gap: 24px; }
+.domain-stat .v { font-size: 22px; font-weight: 700; }
+.domain-stat .l { font-size: 11px; opacity: 0.85; }
+
+/* ---------- UPLOAD WIZARD ---------- */
+.wizard {
+  background: white; border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 28px; min-height: 480px;
+}
+.stepper { display: flex; gap: 8px; margin-bottom: 24px; align-items: center; }
+.step {
+  display: flex; align-items: center; gap: 10px; flex: 1;
+  padding: 12px 14px; border-radius: 10px;
+  background: var(--gray-100); transition: all 0.3s;
+}
+.step.active { background: rgba(37,99,235,0.1); }
+.step.done { background: rgba(16,185,129,0.1); }
+.step-num {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--gray-200); color: var(--gray-600);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 12px;
+}
+.step.active .step-num { background: var(--primary); color: white; }
+.step.done .step-num { background: var(--green); color: white; }
+.step-label { font-size: 12px; font-weight: 500; color: var(--gray-600); }
+.step.active .step-label { color: var(--primary-2); font-weight: 700; }
+.step.done .step-label { color: #059669; font-weight: 600; }
+
+.wizard-pane { animation: slideRight 0.35s ease; }
+.wizard-pane h3 { font-size: 17px; margin-bottom: 6px; }
+.wizard-pane .help { font-size: 13px; color: var(--gray-600); margin-bottom: 22px; }
+
+.option-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.option-card {
+  border: 2px solid var(--gray-200); border-radius: var(--radius);
+  padding: 18px; cursor: pointer; transition: all 0.2s;
+  background: white;
+}
+.option-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow); }
+.option-card.selected { border-color: var(--primary); background: rgba(37,99,235,0.04); }
+.option-card .opt-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; font-size: 22px; }
+.option-card h4 { font-size: 14.5px; margin-bottom: 4px; }
+.option-card p { font-size: 12px; color: var(--gray-600); line-height: 1.45; }
+
+.report-card {
+  background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-sm);
+  padding: 14px; display: flex; gap: 14px; align-items: center;
+  transition: all 0.18s; margin-bottom: 10px;
+}
+.report-card:hover { border-color: var(--primary); box-shadow: var(--shadow); }
+.report-card.uploaded { border-color: var(--green); background: rgba(16,185,129,0.04); }
+.report-card .tcode {
+  font-family: "SFMono-Regular", Menlo, monospace; font-size: 12px;
+  background: #1e293b; color: #e2e8f0; padding: 6px 10px; border-radius: 6px;
+  font-weight: 600; min-width: 100px; text-align: center;
+}
+.report-card .info { flex: 1; }
+.report-card .info h5 { font-size: 13.5px; margin-bottom: 2px; }
+.report-card .info p { font-size: 12px; color: var(--gray-600); line-height: 1.4; }
+.report-card .actions { display: flex; gap: 8px; }
+.upload-btn {
+  background: var(--primary); color: white; padding: 8px 14px;
+  border-radius: 6px; font-size: 12px; cursor: pointer; border: 0; font-weight: 600;
+}
+.upload-btn:hover { background: var(--primary-2); }
+.upload-btn.done { background: var(--green); }
+
+.wizard-actions { display: flex; justify-content: space-between; margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--gray-100); }
+
+/* ---------- AI MAPPING ---------- */
+.mapping-table {
+  width: 100%; border-collapse: collapse; background: white;
+  border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); margin-bottom: 16px;
+}
+.mapping-table th {
+  background: #f8fafc; text-align: left; padding: 12px 14px;
+  font-size: 12px; font-weight: 600; color: var(--gray-600);
+  border-bottom: 1px solid var(--gray-200); text-transform: uppercase; letter-spacing: 0.4px;
+}
+.mapping-table td {
+  padding: 11px 14px; font-size: 13px; border-bottom: 1px solid var(--gray-100);
+}
+.mapping-table tr:last-child td { border-bottom: 0; }
+.mapping-table select {
+  padding: 6px 10px; border: 1px solid var(--gray-200); border-radius: 6px;
+  font-size: 12.5px; background: white; min-width: 180px;
+}
+.confidence {
+  display: inline-block; font-size: 11px; padding: 3px 8px;
+  border-radius: 10px; font-weight: 600;
+}
+.confidence.high { background: rgba(16,185,129,0.15); color: var(--green); }
+.confidence.med { background: rgba(245,158,11,0.15); color: var(--amber); }
+.confidence.low { background: rgba(239,68,68,0.15); color: var(--red); }
+
+/* ---------- PROGRESS / LOADER ---------- */
+.ai-loader {
+  text-align: center; padding: 40px;
+}
+.ai-spinner {
+  width: 60px; height: 60px; border-radius: 50%;
+  border: 4px solid var(--gray-200); border-top-color: var(--primary);
+  margin: 0 auto 20px; animation: spin 1s linear infinite;
+}
+.progress-bar { height: 6px; background: var(--gray-200); border-radius: 3px; overflow: hidden; margin: 12px 0; }
+.progress-bar-fill {
+  height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent));
+  width: 0; transition: width 0.4s ease;
+}
+
+/* ---------- DRILL-DOWN MODAL ---------- */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(15,23,42,0.55);
+  display: none; z-index: 100; align-items: center; justify-content: center;
+  animation: fadeIn 0.2s;
+}
+.modal-overlay.active { display: flex; }
+.modal {
+  background: white; border-radius: var(--radius);
+  width: 800px; max-width: 92vw; max-height: 86vh; overflow: auto;
+  animation: slideRight 0.35s;
+}
+.modal-head {
+  padding: 22px 26px; border-bottom: 1px solid var(--gray-100);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.modal-head h3 { font-size: 17px; }
+.modal-close {
+  width: 30px; height: 30px; border: 0; background: var(--gray-100);
+  border-radius: 50%; cursor: pointer; font-size: 16px;
+}
+.modal-body { padding: 22px 26px; }
+
+.kri-detail-stat { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0; }
+.detail-stat-box { background: var(--bg-soft); padding: 14px; border-radius: 8px; }
+.detail-stat-box .l { font-size: 11px; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.4px; }
+.detail-stat-box .v { font-size: 20px; font-weight: 700; margin-top: 4px; }
+
+.outlier-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px; }
+.outlier-table th, .outlier-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--gray-100); }
+.outlier-table th { font-size: 11.5px; font-weight: 600; color: var(--gray-600); text-transform: uppercase; }
+.outlier-table .flag-red { color: var(--red); font-weight: 600; }
+
+.alert-banner {
+  padding: 14px 16px; border-radius: 8px; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px; font-size: 13px;
+}
+.alert-banner.success { background: rgba(16,185,129,0.1); color: #047857; }
+.alert-banner.info { background: rgba(37,99,235,0.08); color: var(--primary-2); }
+.alert-banner.warn { background: rgba(245,158,11,0.1); color: #92400e; }
+
+/* ---------- CARDS ---------- */
+.card {
+  background: white; border-radius: var(--radius);
+  padding: 22px; box-shadow: var(--shadow); margin-bottom: 18px;
+}
+.card h3 { font-size: 16px; margin-bottom: 12px; }
+
+.split-2 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px; }
+
+/* Pipeline diagram */
+.pipeline {
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(180deg, #f8fafc, white);
+  padding: 22px; border-radius: var(--radius); border: 1px solid var(--gray-200);
+}
+.pipe-stage { text-align: center; flex: 1; position: relative; }
+.pipe-stage .icon {
+  width: 60px; height: 60px; border-radius: 14px;
+  background: white; box-shadow: var(--shadow);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 8px; font-size: 26px; border: 2px solid var(--gray-200);
+}
+.pipe-stage .name { font-size: 12px; font-weight: 600; }
+.pipe-stage .desc { font-size: 10.5px; color: var(--gray-600); margin-top: 2px; }
+.pipe-stage.bronze .icon { border-color: #b45309; color: #b45309; }
+.pipe-stage.silver .icon { border-color: #6b7280; color: #6b7280; }
+.pipe-stage.gold .icon { border-color: #ca8a04; color: #ca8a04; }
+.pipe-arrow {
+  flex: 0 0 30px; position: relative; height: 2px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+}
+.pipe-arrow::after {
+  content: ""; position: absolute; right: -2px; top: -4px;
+  border: 5px solid transparent; border-left-color: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .sidebar { width: 64px; padding: 14px 0; }
+  .brand-name, .brand-sub, .nav-section, .nav-item span { display: none; }
+  .nav-item { justify-content: center; padding: 12px; }
+  .main { margin-left: 64px; }
+  .split-2 { grid-template-columns: 1fr; }
+  .search-box { width: 160px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<!-- ============== SIDEBAR ============== -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">RA</div>
+    <div>
+      <div class="brand-name">RiskSense</div>
+      <div class="brand-sub">KRI Analytics Platform</div>
+    </div>
+  </div>
+  <div class="nav">
+    <div class="nav-section">Monitor</div>
+    <div class="nav-item active" data-page="dashboard"><span class="nav-icon">📊</span><span>Dashboard</span></div>
+    <div class="nav-item" data-page="r2r"><span class="nav-icon">📒</span><span>Record to Report</span></div>
+    <div class="nav-item" data-page="o2c"><span class="nav-icon">💰</span><span>Order to Cash</span></div>
+    <div class="nav-item" data-page="itgc"><span class="nav-icon">🔐</span><span>ITGC</span></div>
+
+    <div class="nav-section">Data</div>
+    <div class="nav-item" data-page="upload"><span class="nav-icon">📤</span><span>Manual Upload</span></div>
+    <div class="nav-item" data-page="lineage"><span class="nav-icon">🧬</span><span>Data Lineage</span></div>
+    <div class="nav-item" data-page="library"><span class="nav-icon">📚</span><span>KRI Library</span></div>
+
+    <div class="nav-section">Admin</div>
+    <div class="nav-item" data-page="settings"><span class="nav-icon">⚙️</span><span>Settings</span></div>
+  </div>
+  <div class="user-card">
+    <div class="avatar">AG</div>
+    <div>
+      <div style="font-weight:600">Abhishek G.</div>
+      <div style="opacity:0.7">Internal Auditor</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ============== MAIN ============== -->
+<div class="main">
+
+  <div class="topbar">
+    <div class="crumbs">RiskSense / <strong id="crumb-page">Dashboard</strong></div>
+    <div class="topbar-actions">
+      <input class="search-box" placeholder="🔍 Search KRIs, processes, reports..." />
+      <button class="icon-btn" title="Notifications">🔔<span class="notif-dot"></span></button>
+      <button class="icon-btn" title="Help">❓</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ============== DASHBOARD ============== -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Risk Posture Overview</div>
+          <div class="page-sub">Continuous monitoring across all process domains · refreshed 2 min ago</div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-ghost">🔄 Refresh</button>
+          <button class="btn btn-primary" onclick="goto('upload')">📤 Manual Upload</button>
+        </div>
+      </div>
+
+      <div class="alert-banner info">
+        💡 <strong>Connector status:</strong> SAP S/4HANA → Live · Oracle Fusion → Live · MS Dynamics → Manual upload (last sync 5d ago)
+      </div>
+
+      <!-- Domain summary -->
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; margin-bottom:22px;">
+        <div class="domain-strip" style="margin:0; cursor:pointer;" onclick="goto('r2r')">
+          <div>
+            <h2>📒 Record to Report</h2>
+            <div class="desc">5 KRIs · 2 amber · 1 red</div>
+          </div>
+          <div class="domain-stats">
+            <div class="domain-stat"><div class="v">1.2M</div><div class="l">JEs</div></div>
+          </div>
+        </div>
+        <div class="domain-strip" style="margin:0; background:linear-gradient(135deg,#065f46,#0e7490); cursor:pointer;" onclick="goto('o2c')">
+          <div>
+            <h2>💰 Order to Cash</h2>
+            <div class="desc">5 KRIs · 1 amber · 0 red</div>
+          </div>
+          <div class="domain-stats">
+            <div class="domain-stat"><div class="v">$48M</div><div class="l">AR</div></div>
+          </div>
+        </div>
+        <div class="domain-strip" style="margin:0; background:linear-gradient(135deg,#7c2d12,#9f1239); cursor:pointer;" onclick="goto('itgc')">
+          <div>
+            <h2>🔐 ITGC</h2>
+            <div class="desc">5 KRIs · 0 amber · 2 red</div>
+          </div>
+          <div class="domain-stats">
+            <div class="domain-stat"><div class="v">2,341</div><div class="l">Users</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Top KRI Outliers (last 30 days)</h3>
+        <div style="height:240px; position:relative;"><canvas id="trendChart"></canvas></div>
+      </div>
+
+      <div class="card">
+        <h3>Recent Activity</h3>
+        <table class="outlier-table">
+          <thead><tr><th>Time</th><th>Event</th><th>Domain</th><th>Source</th></tr></thead>
+          <tbody>
+            <tr><td>2 min ago</td><td>3 SoD violations detected</td><td>ITGC</td><td>SAP S/4HANA</td></tr>
+            <tr><td>14 min ago</td><td>DSO crossed amber threshold (54 days)</td><td>O2C</td><td>Oracle Fusion</td></tr>
+            <tr><td>1 hr ago</td><td>Manual upload: GL_Journal_Apr2026.xlsx accepted</td><td>R2R</td><td>Manual</td></tr>
+            <tr><td>3 hr ago</td><td>Weekend journals: 47 entries posted</td><td>R2R</td><td>SAP S/4HANA</td></tr>
+            <tr><td>5 hr ago</td><td>15 inactive users with active access</td><td>ITGC</td><td>SAP S/4HANA</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============== R2R PAGE ============== -->
+    <div class="page" id="page-r2r">
+      <div class="domain-strip">
+        <div>
+          <h2>📒 Record to Report (R2R)</h2>
+          <div class="desc">Continuous monitoring of close-cycle journal activity, manual entries, and reconciliation hygiene</div>
+        </div>
+        <div class="domain-stats">
+          <div class="domain-stat"><div class="v">1.2M</div><div class="l">JEs YTD</div></div>
+          <div class="domain-stat"><div class="v">2</div><div class="l">Amber</div></div>
+          <div class="domain-stat"><div class="v">1</div><div class="l">Red</div></div>
+        </div>
+      </div>
+
+      <div class="kri-grid" id="r2r-tiles"></div>
+
+      <div class="card" style="margin-top:18px;">
+        <h3>Period-end Close: Weekend Journal Posting (last 12 weeks)</h3>
+        <div style="height:220px; position:relative;"><canvas id="r2rChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ============== O2C PAGE ============== -->
+    <div class="page" id="page-o2c">
+      <div class="domain-strip" style="background:linear-gradient(135deg,#065f46,#0e7490);">
+        <div>
+          <h2>💰 Order to Cash (O2C)</h2>
+          <div class="desc">Continuous risk monitoring across orders, billing, collections and credit hygiene</div>
+        </div>
+        <div class="domain-stats">
+          <div class="domain-stat"><div class="v">$48M</div><div class="l">AR</div></div>
+          <div class="domain-stat"><div class="v">52d</div><div class="l">DSO</div></div>
+          <div class="domain-stat"><div class="v">1</div><div class="l">Amber</div></div>
+        </div>
+      </div>
+
+      <div class="kri-grid" id="o2c-tiles"></div>
+
+      <div class="card" style="margin-top:18px;">
+        <h3>Daily Sales Outstanding - 90 day trend</h3>
+        <div style="height:220px; position:relative;"><canvas id="o2cChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ============== ITGC PAGE ============== -->
+    <div class="page" id="page-itgc">
+      <div class="domain-strip" style="background:linear-gradient(135deg,#7c2d12,#9f1239);">
+        <div>
+          <h2>🔐 IT General Controls (ITGC)</h2>
+          <div class="desc">Access, change-management and security operations risk indicators</div>
+        </div>
+        <div class="domain-stats">
+          <div class="domain-stat"><div class="v">2,341</div><div class="l">Users</div></div>
+          <div class="domain-stat"><div class="v">38</div><div class="l">SoD viol.</div></div>
+          <div class="domain-stat"><div class="v">2</div><div class="l">Red</div></div>
+        </div>
+      </div>
+
+      <div class="kri-grid" id="itgc-tiles"></div>
+
+      <div class="card" style="margin-top:18px;">
+        <h3>Privileged user activity (last 7 days, hourly)</h3>
+        <div style="height:220px; position:relative;"><canvas id="itgcChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ============== UPLOAD WIZARD ============== -->
+    <div class="page" id="page-upload">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Manual Data Upload</div>
+          <div class="page-sub">Upload standard ERP reports for KRI analysis when direct connector is unavailable</div>
+        </div>
+      </div>
+
+      <div class="wizard">
+        <div class="stepper" id="stepper">
+          <div class="step active" data-step="1"><div class="step-num">1</div><div class="step-label">Process Domain</div></div>
+          <div class="step" data-step="2"><div class="step-num">2</div><div class="step-label">Source ERP</div></div>
+          <div class="step" data-step="3"><div class="step-num">3</div><div class="step-label">Upload Reports</div></div>
+          <div class="step" data-step="4"><div class="step-num">4</div><div class="step-label">AI Mapping</div></div>
+          <div class="step" data-step="5"><div class="step-num">5</div><div class="step-label">Confirm</div></div>
+          <div class="step" data-step="6"><div class="step-num">6</div><div class="step-label">Done</div></div>
+        </div>
+
+        <!-- Step 1: process domain -->
+        <div class="wizard-pane" id="pane-1">
+          <h3>Step 1: Choose process domain</h3>
+          <div class="help">Select the audit area you are uploading data for.</div>
+          <div class="option-grid">
+            <div class="option-card" onclick="selectDomain('R2R', this)">
+              <div class="opt-icon" style="background:rgba(37,99,235,0.1); color:var(--primary);">📒</div>
+              <h4>Record to Report</h4>
+              <p>Journal entries, period close, reconciliations, GL postings.</p>
+            </div>
+            <div class="option-card" onclick="selectDomain('O2C', this)">
+              <div class="opt-icon" style="background:rgba(16,185,129,0.1); color:var(--green);">💰</div>
+              <h4>Order to Cash</h4>
+              <p>Sales orders, deliveries, billing, AR aging, collections.</p>
+            </div>
+            <div class="option-card" onclick="selectDomain('ITGC', this)">
+              <div class="opt-icon" style="background:rgba(239,68,68,0.1); color:var(--red);">🔐</div>
+              <h4>IT General Controls</h4>
+              <p>User access, SoD, change management, audit logs.</p>
+            </div>
+          </div>
+          <div class="wizard-actions">
+            <span></span>
+            <button class="btn btn-primary" id="step1-next" disabled onclick="goStep(2)">Continue →</button>
+          </div>
+        </div>
+
+        <!-- Step 2: source ERP -->
+        <div class="wizard-pane" id="pane-2" style="display:none;">
+          <h3>Step 2: Select your source ERP system</h3>
+          <div class="help">We use this to identify which standard reports / Tcodes to ask for.</div>
+          <div class="option-grid">
+            <div class="option-card" onclick="selectErp('SAP_S4', this)">
+              <div class="opt-icon" style="background:rgba(0,114,198,0.1); color:#0072c6;">SAP</div>
+              <h4>SAP S/4HANA</h4>
+              <p>FBL3N, F.01, SE16N, SUIM, SM20</p>
+            </div>
+            <div class="option-card" onclick="selectErp('SAP_ECC', this)">
+              <div class="opt-icon" style="background:rgba(0,114,198,0.1); color:#0072c6;">SAP</div>
+              <h4>SAP ECC 6.0</h4>
+              <p>FBL3N, FBL5N, VA05, VL06, SUIM</p>
+            </div>
+            <div class="option-card" onclick="selectErp('ORACLE_R12', this)">
+              <div class="opt-icon" style="background:rgba(220,38,38,0.1); color:#dc2626;">ORA</div>
+              <h4>Oracle EBS R12</h4>
+              <p>GL Journal, AR Aging, FND User reports</p>
+            </div>
+            <div class="option-card" onclick="selectErp('ORACLE_FUSION', this)">
+              <div class="opt-icon" style="background:rgba(220,38,38,0.1); color:#dc2626;">ORA</div>
+              <h4>Oracle Fusion Cloud</h4>
+              <p>OTBI: GL Journals, Customer Aging, Roles</p>
+            </div>
+            <div class="option-card" onclick="selectErp('MS_DYNAMICS', this)">
+              <div class="opt-icon" style="background:rgba(0,103,180,0.1); color:#0067b4;">D365</div>
+              <h4>MS Dynamics 365</h4>
+              <p>F&O: General Journal, Customer Aging</p>
+            </div>
+          </div>
+          <div class="wizard-actions">
+            <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
+            <button class="btn btn-primary" id="step2-next" disabled onclick="goStep(3)">Continue →</button>
+          </div>
+        </div>
+
+        <!-- Step 3: upload reports -->
+        <div class="wizard-pane" id="pane-3" style="display:none;">
+          <h3>Step 3: Upload required reports</h3>
+          <div class="help" id="step3-help">Download these standard reports from your ERP and upload them here.</div>
+          <div id="report-list"></div>
+          <div class="wizard-actions">
+            <button class="btn btn-ghost" onclick="goStep(2)">← Back</button>
+            <button class="btn btn-primary" id="step3-next" disabled onclick="runAiMapping()">Run AI Mapping →</button>
+          </div>
+        </div>
+
+        <!-- Step 4: AI mapping -->
+        <div class="wizard-pane" id="pane-4" style="display:none;">
+          <h3>Step 4: AI mapping in progress</h3>
+          <div class="help">Our model analyzes your file structure and maps source columns to target tables.</div>
+
+          <div id="ai-loader-block" class="ai-loader">
+            <div class="ai-spinner"></div>
+            <div style="font-weight:600; font-size:14px;" id="ai-status">Inspecting file structure...</div>
+            <div class="progress-bar" style="max-width:400px; margin: 12px auto;"><div class="progress-bar-fill" id="ai-progress"></div></div>
+            <div style="font-size:12px; color:var(--gray-600); max-width:480px; margin: 0 auto;" id="ai-substatus">
+              Checking column headers, data types, and matching against trained ERP report templates...
+            </div>
+          </div>
+
+          <div id="mapping-result" style="display:none;">
+            <div class="alert-banner success">
+              ✓ AI mapping complete. <strong>Review and adjust</strong> any mappings below before confirming.
+            </div>
+            <h4 style="font-size:14px; margin: 14px 0 8px;">Mapping: <code id="mapping-file">FBL3N_Apr2026.csv</code> → <code>r2r.gl_journal_lines</code></h4>
+            <table class="mapping-table">
+              <thead><tr><th>Source Column</th><th style="width:30px;">→</th><th>Target Field</th><th>Confidence</th><th>Action</th></tr></thead>
+              <tbody id="mapping-tbody"></tbody>
+            </table>
+
+            <div class="wizard-actions">
+              <button class="btn btn-ghost" onclick="goStep(3)">← Re-upload</button>
+              <button class="btn btn-primary" onclick="goStep(5)">Confirm Mapping →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 5: confirm and push -->
+        <div class="wizard-pane" id="pane-5" style="display:none;">
+          <h3>Step 5: Confirm and push to gold layer</h3>
+          <div class="help">Records currently sit in ADLS staging. On confirmation they will be promoted to Databricks gold and tagged as manual upload.</div>
+
+          <div class="kri-detail-stat">
+            <div class="detail-stat-box"><div class="l">Files</div><div class="v" id="confirm-files">3</div></div>
+            <div class="detail-stat-box"><div class="l">Records to load</div><div class="v">14,287</div></div>
+            <div class="detail-stat-box"><div class="l">Auto-mapped fields</div><div class="v">94%</div></div>
+          </div>
+
+          <div class="alert-banner info">
+            🛈 All loaded records will receive <code>source_type = 'MANUAL'</code>, <code>upload_batch_id</code>, and uploader/timestamp metadata for traceability.
+          </div>
+
+          <h4 style="margin: 14px 0 6px; font-size:14px;">Data quality checks</h4>
+          <table class="mapping-table">
+            <thead><tr><th>Check</th><th>Result</th><th>Records</th></tr></thead>
+            <tbody>
+              <tr><td>Mandatory fields populated</td><td><span class="confidence high">PASS</span></td><td>14,287 / 14,287</td></tr>
+              <tr><td>Date format valid</td><td><span class="confidence high">PASS</span></td><td>14,287 / 14,287</td></tr>
+              <tr><td>Posted amounts numeric</td><td><span class="confidence high">PASS</span></td><td>14,287 / 14,287</td></tr>
+              <tr><td>Duplicate primary keys</td><td><span class="confidence med">WARN</span></td><td>3 duplicates ignored</td></tr>
+              <tr><td>Reference data joins</td><td><span class="confidence high">PASS</span></td><td>100% matched</td></tr>
+            </tbody>
+          </table>
+
+          <div class="wizard-actions">
+            <button class="btn btn-ghost" onclick="goStep(4)">← Back</button>
+            <button class="btn btn-success" onclick="confirmPush()">✓ Confirm &amp; Push</button>
+          </div>
+        </div>
+
+        <!-- Step 6: done -->
+        <div class="wizard-pane" id="pane-6" style="display:none; text-align:center; padding: 30px 0;">
+          <div style="font-size:64px; margin-bottom:8px;">✅</div>
+          <h3>Upload complete!</h3>
+          <div class="help" style="max-width:520px; margin: 8px auto 24px;">
+            14,287 records were successfully promoted to Databricks gold tables. The relevant KRI tiles have been activated and will reflect the new data within 60 seconds.
+          </div>
+          <div style="display:flex; gap:12px; justify-content:center;">
+            <button class="btn btn-ghost" onclick="resetWizard()">Upload More</button>
+            <button class="btn btn-primary" onclick="goto('r2r')">View KRI Dashboard →</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ============== LIBRARY ============== -->
+    <div class="page" id="page-library">
+      <div class="page-header">
+        <div>
+          <div class="page-title">KRI Library</div>
+          <div class="page-sub">Pre-built catalog of 15 risk indicators across R2R, O2C, ITGC</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tabs" style="margin:0 0 16px;">
+          <div class="tab active" onclick="filterLib('all', this)">All (15)</div>
+          <div class="tab" onclick="filterLib('R2R', this)">R2R (5)</div>
+          <div class="tab" onclick="filterLib('O2C', this)">O2C (5)</div>
+          <div class="tab" onclick="filterLib('ITGC', this)">ITGC (5)</div>
+        </div>
+        <table class="mapping-table" id="library-table">
+          <thead><tr><th>KRI</th><th>Domain</th><th>Threshold (Amber → Red)</th><th>Frequency</th><th>Source Reports</th></tr></thead>
+          <tbody id="library-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============== LINEAGE ============== -->
+    <div class="page" id="page-lineage">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Data Lineage</div>
+          <div class="page-sub">Trace how source data lands in KRI tiles - bronze, silver, gold</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>FDI Medallion Pipeline</h3>
+        <div class="pipeline">
+          <div class="pipe-stage">
+            <div class="icon">🏢</div>
+            <div class="name">Source ERP</div>
+            <div class="desc">SAP / Oracle / D365</div>
+          </div>
+          <div class="pipe-arrow"></div>
+          <div class="pipe-stage bronze">
+            <div class="icon">🟫</div>
+            <div class="name">Bronze</div>
+            <div class="desc">Raw landing</div>
+          </div>
+          <div class="pipe-arrow"></div>
+          <div class="pipe-stage silver">
+            <div class="icon">⚪</div>
+            <div class="name">Silver</div>
+            <div class="desc">Harmonized</div>
+          </div>
+          <div class="pipe-arrow"></div>
+          <div class="pipe-stage gold">
+            <div class="icon">🟨</div>
+            <div class="name">Gold</div>
+            <div class="desc">KRI views</div>
+          </div>
+          <div class="pipe-arrow"></div>
+          <div class="pipe-stage">
+            <div class="icon">📊</div>
+            <div class="name">Frontend</div>
+            <div class="desc">React UI</div>
+          </div>
+        </div>
+        <div class="alert-banner info" style="margin-top:18px;">
+          💡 The orange path indicates a manual upload route through ADLS staging into the gold layer with traceability tags.
+        </div>
+      </div>
+
+      <div class="split-2">
+        <div class="card">
+          <h3>Recent Loads</h3>
+          <table class="outlier-table">
+            <thead><tr><th>Source</th><th>Type</th><th>Records</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>SAP S/4HANA · BSEG</td><td>Connector</td><td>284,201</td><td><span class="confidence high">SUCCESS</span></td></tr>
+              <tr><td>Oracle Fusion · AR</td><td>Connector</td><td>48,109</td><td><span class="confidence high">SUCCESS</span></td></tr>
+              <tr><td>FBL3N_Apr2026.csv</td><td>Manual</td><td>14,287</td><td><span class="confidence high">SUCCESS</span></td></tr>
+              <tr><td>D365 · GL Journal</td><td>Manual</td><td>9,143</td><td><span class="confidence med">REVIEW</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h3>Provenance for selected record</h3>
+          <pre style="background:#0f172a; color:#e2e8f0; padding:14px; border-radius:8px; font-size:11.5px; overflow-x:auto;">{
+  "record_id": "GL-4509-20260415",
+  "source_system": "SAP_S4",
+  "source_type": "CONNECTOR",
+  "ingested_at": "2026-05-08T03:14:21Z",
+  "upload_batch_id": null,
+  "bronze_path": "abfss://bronze/sap/bseg/2026/05/08/...parquet",
+  "silver_table": "silver.gl_lines_harmonized",
+  "gold_view": "gold.r2r_kri_weekend_journals_v1",
+  "transformations": [
+    "trim/null-normalize",
+    "currency_normalization_to_usd",
+    "fiscal_period_derivation"
+  ]
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============== SETTINGS ============== -->
+    <div class="page" id="page-settings">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Settings</div>
+          <div class="page-sub">Connector and threshold configuration</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Connectors</h3>
+        <table class="outlier-table">
+          <thead><tr><th>System</th><th>Type</th><th>Status</th><th>Last Sync</th></tr></thead>
+          <tbody>
+            <tr><td>SAP S/4HANA</td><td>Direct (CDC via Databricks)</td><td><span class="confidence high">LIVE</span></td><td>2 min ago</td></tr>
+            <tr><td>Oracle Fusion</td><td>OTBI export → ADLS</td><td><span class="confidence high">LIVE</span></td><td>4 min ago</td></tr>
+            <tr><td>MS Dynamics 365</td><td>Manual upload</td><td><span class="confidence med">MANUAL</span></td><td>5 days ago</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ============== DRILL-DOWN MODAL ============== -->
+<div class="modal-overlay" id="drilldown">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3 id="dd-title">KRI Detail</h3>
+        <div style="font-size:12px; color:var(--gray-600); margin-top:3px;" id="dd-sub">Domain · Frequency · Threshold</div>
+      </div>
+      <button class="modal-close" onclick="closeDrill()">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="dd-banner"></div>
+      <div class="kri-detail-stat" id="dd-stats"></div>
+      <h4 style="font-size:13px; margin: 16px 0 8px;">Trend (last 30 days)</h4>
+      <div style="height:180px; position:relative;"><canvas id="ddChart"></canvas></div>
+      <h4 style="font-size:13px; margin: 16px 0 8px;">Outliers</h4>
+      <table class="outlier-table" id="dd-outliers"></table>
+      <h4 style="font-size:13px; margin: 16px 0 8px;">Source &amp; Logic</h4>
+      <div style="background:#f8fafc; padding:12px 14px; border-radius:8px; font-size:12.5px; color:var(--gray-800); line-height:1.6;" id="dd-logic"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ====== KRI catalog with synthetic data ======
+const KRIs = {
+  R2R: [
+    { id: "r2r1", name: "Journals posted on weekends", value: "47", trend: "+12 vs last month", flag: "red", spark: [12,9,15,11,18,22,38,47], threshold: "5 → 20", desc: "Count of GL postings with posting date on Sat/Sun.", reports: "FBL3N (SAP) · GL Journal Detail (Oracle) · General Journal (D365)", logic: "Source: gl_journal_lines. Logic: COUNT(*) WHERE EXTRACT(DOW FROM posting_date) IN (0,6) AND fiscal_period = current_period." },
+    { id: "r2r2", name: "Manual journals as % of total", value: "18.4%", trend: "+3.1 pp", flag: "amber", spark: [9,11,13,15,16,17,18,18.4], threshold: "10% → 25%", desc: "Manual JE volume / total JE volume.", reports: "FBL3N + BKPF (SAP) · GL Journals (Oracle) · LedgerJournal (D365)", logic: "SUM(CASE WHEN entry_type='MANUAL' THEN 1 ELSE 0 END) / COUNT(*) * 100" },
+    { id: "r2r3", name: "Period close days", value: "8", trend: "Target: 5d", flag: "amber", spark: [5,5,6,6,7,7,8,8], threshold: "5 → 7", desc: "Days from period-end to close completion.", reports: "OB52/Period Status (SAP) · Open/Close Periods (Oracle) · Period close (D365)", logic: "DATE_DIFF(close_complete_date, period_end_date)" },
+    { id: "r2r4", name: "Reversed journals", value: "23", trend: "-4 vs last month", flag: "green", spark: [38,29,25,24,27,25,24,23], threshold: "30 → 50", desc: "Journals reversed within 30 days of posting.", reports: "FB08/FBL3N reversal flag (SAP) · GL Reversal (Oracle) · Journal reversal (D365)", logic: "COUNT(*) WHERE reversal_flag = TRUE AND days_since_posting <= 30" },
+    { id: "r2r5", name: "High-value JE without dual approval", value: "6", trend: "+2 from last month", flag: "red", spark: [2,2,3,3,4,4,5,6], threshold: "0 → 3", desc: "JEs > $250k with single approver.", reports: "BKPF + USR02 join (SAP) · GL Approval History (Oracle) · Workflow history (D365)", logic: "COUNT(*) WHERE amount_usd > 250000 AND approver_count < 2" }
+  ],
+  O2C: [
+    { id: "o2c1", name: "Daily Sales Outstanding", value: "52d", trend: "+4 vs target", flag: "amber", spark: [45,46,47,48,49,50,51,52], threshold: "45 → 60", desc: "AR / Avg daily sales × 365.", reports: "F.21/FBL5N (SAP) · AR Aging (Oracle) · Customer aging (D365)", logic: "(AR_balance / avg_daily_sales)" },
+    { id: "o2c2", name: "Credit limit overrides", value: "11", trend: "-2 vs last month", flag: "green", spark: [18,15,14,13,12,11,11,11], threshold: "15 → 30", desc: "Sales orders booked above customer credit limit.", reports: "VA05 + Credit master (SAP) · Order holds (Oracle) · SalesTable (D365)", logic: "COUNT(*) WHERE order_value > customer_credit_limit AND override_flag = TRUE" },
+    { id: "o2c3", name: "Disputed invoices > 60d", value: "$1.2M", trend: "+$200k", flag: "amber", spark: [0.6,0.7,0.8,0.9,1.0,1.1,1.15,1.2], threshold: "$500k → $1M", desc: "Open disputed invoice value past 60 days.", reports: "FBL5N dispute flag (SAP) · AR Dispute (Oracle) · CustInvoice dispute (D365)", logic: "SUM(open_amount) WHERE dispute_flag=TRUE AND aging_days > 60" },
+    { id: "o2c4", name: "SO without delivery (>14d)", value: "287", trend: "-12", flag: "green", spark: [320,310,305,300,295,290,288,287], threshold: "500 → 1000", desc: "Sales orders open >14 days without delivery doc.", reports: "VA05 + VL06 (SAP) · OTBI Order Fulfillment (Oracle) · Sales line status (D365)", logic: "COUNT(*) WHERE order_status='OPEN' AND DATE_DIFF(now, order_date) > 14 AND delivery_id IS NULL" },
+    { id: "o2c5", name: "Duplicate customer master", value: "14", trend: "+3", flag: "amber", spark: [8,9,10,11,12,13,14,14], threshold: "10 → 25", desc: "Customers matching by tax ID or fuzzy name.", reports: "KNA1 (SAP) · HZ_PARTIES (Oracle) · CustTable (D365)", logic: "GROUP BY tax_id HAVING COUNT(*) > 1" }
+  ],
+  ITGC: [
+    { id: "itgc1", name: "SoD violations (active)", value: "38", trend: "+5", flag: "red", spark: [25,28,30,32,33,35,37,38], threshold: "10 → 25", desc: "Users with conflicting role combinations.", reports: "SUIM (SAP) · User-Role Report (Oracle FND) · Security role audit (D365)", logic: "COUNT(DISTINCT user_id) WHERE conflict_matrix_match = TRUE" },
+    { id: "itgc2", name: "Privileged user activity (off hours)", value: "143", trend: "+22", flag: "red", spark: [80,90,100,110,120,130,140,143], threshold: "50 → 100", desc: "SAP_ALL or sysadmin transactions outside business hours.", reports: "SM20 (SAP) · FND Login Audit (Oracle) · Security event log (D365)", logic: "COUNT(*) WHERE role IN priv_roles AND timestamp NOT IN business_hours" },
+    { id: "itgc3", name: "Failed login attempts (>5)", value: "62", trend: "stable", flag: "amber", spark: [55,60,58,62,65,60,62,62], threshold: "30 → 100", desc: "User accounts with 5+ failed logins in 24h.", reports: "SU01/SM20 (SAP) · FND_LOGINS (Oracle) · Sign-in logs (D365)", logic: "COUNT(DISTINCT user_id) WHERE failed_login_count_24h >= 5" },
+    { id: "itgc4", name: "Inactive users with active access", value: "15", trend: "+1", flag: "amber", spark: [10,11,12,13,14,15,15,15], threshold: "10 → 25", desc: "User accounts with no logon for 90+ days but still active.", reports: "USR02/SUIM (SAP) · FND_USER (Oracle) · UserInfo (D365)", logic: "COUNT(*) WHERE last_login_date < (now - 90d) AND status='ACTIVE'" },
+    { id: "itgc5", name: "Password policy exceptions", value: "4", trend: "0", flag: "green", spark: [4,4,4,4,4,4,4,4], threshold: "5 → 10", desc: "Users exempted from organization password policy.", reports: "SECPOL/USR40 (SAP) · DBA_USERS (Oracle) · Password policy (D365)", logic: "COUNT(*) WHERE password_policy_exempt = TRUE" }
+  ]
+};
+
+// ====== Render KRI tiles ======
+function renderTiles(domain, containerId) {
+  const c = document.getElementById(containerId);
+  c.innerHTML = "";
+  KRIs[domain].forEach((k, i) => {
+    const tile = document.createElement("div");
+    tile.className = "kri-tile " + k.flag;
+    tile.style.animationDelay = (i * 60) + "ms";
+    tile.onclick = () => openDrill(k);
+    tile.innerHTML = `
+      <div class="kri-head">
+        <div class="kri-name">${k.name}</div>
+        <div class="kri-status ${k.flag}">${k.flag === "red" ? "RED" : k.flag === "amber" ? "AMBER" : "GREEN"}</div>
+      </div>
+      <div class="kri-value">${k.value}</div>
+      <div class="kri-trend ${k.flag === 'red' ? 'up' : k.flag === 'green' ? 'down' : ''}">${k.trend}</div>
+      <svg class="kri-spark" viewBox="0 0 200 40" preserveAspectRatio="none">
+        <polyline fill="none" stroke="${k.flag === 'red' ? '#ef4444' : k.flag === 'amber' ? '#f59e0b' : '#10b981'}"
+          stroke-width="2" points="${sparkPoints(k.spark)}" />
+      </svg>
+      <div class="kri-meta">
+        <span>📌 ${k.threshold}</span>
+        <span>${k.reports.split('·')[0].trim()}</span>
+      </div>
+    `;
+    c.appendChild(tile);
+  });
+}
+function sparkPoints(arr) {
+  const min = Math.min(...arr), max = Math.max(...arr);
+  return arr.map((v, i) => {
+    const x = (i / (arr.length - 1)) * 200;
+    const y = 40 - ((v - min) / (max - min || 1)) * 36 - 2;
+    return x.toFixed(1) + "," + y.toFixed(1);
+  }).join(" ");
+}
+
+// ====== Navigation ======
+function goto(id) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById("page-" + id).classList.add("active");
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+  const ni = document.querySelector(`.nav-item[data-page="${id}"]`);
+  if (ni) ni.classList.add("active");
+  document.getElementById("crumb-page").textContent = ni ? ni.textContent.trim() : id;
+
+  if (id === "r2r") renderTiles("R2R", "r2r-tiles");
+  if (id === "o2c") renderTiles("O2C", "o2c-tiles");
+  if (id === "itgc") renderTiles("ITGC", "itgc-tiles");
+  if (id === "library") renderLibrary("all");
+}
+document.querySelectorAll(".nav-item").forEach(n =>
+  n.addEventListener("click", () => goto(n.dataset.page))
+);
+
+// ====== Wizard state ======
+let wizardState = { domain: null, erp: null, uploaded: 0, totalRequired: 0 };
+
+const REPORTS_BY_ERP = {
+  R2R: {
+    SAP_S4: [
+      { tcode: "FBL3N", name: "G/L Account Line Items", desc: "All journal entry line items by GL account." },
+      { tcode: "F.01", name: "Financial Statement", desc: "Trial balance and P&L for the period." },
+      { tcode: "BKPF/BSEG", name: "JE Header + Lines extract (SE16N)", desc: "Header & line item full extract for analytics." }
+    ],
+    SAP_ECC: [
+      { tcode: "FBL3N", name: "G/L Account Line Items", desc: "All journal entry line items by GL account." },
+      { tcode: "F.01", name: "Financial Statement", desc: "Trial balance and P&L for the period." },
+      { tcode: "FBL5N", name: "Customer Line Items", desc: "Open and cleared customer items for AR." }
+    ],
+    ORACLE_R12: [
+      { tcode: "GL_JOURNALS", name: "GL Journal Entry Report", desc: "Detail of GL journals with status and lines." },
+      { tcode: "TRIAL_BAL", name: "Trial Balance - Detail", desc: "Account balances for the period." },
+      { tcode: "GL_LINES", name: "Account Analysis Report", desc: "Per-account journal line drill-through." }
+    ],
+    ORACLE_FUSION: [
+      { tcode: "OTBI: GL", name: "GL Journal Lines (OTBI)", desc: "Subject area: General Ledger - Transactional." },
+      { tcode: "OTBI: TB", name: "Trial Balance Detail", desc: "Account balances by ledger and period." },
+      { tcode: "FSCM_RPT", name: "Period Close Status", desc: "Close progress by ledger." }
+    ],
+    MS_DYNAMICS: [
+      { tcode: "GenJournal", name: "General Journal Report", desc: "Posted journal entries with dimensions." },
+      { tcode: "TrialBal", name: "Trial Balance List", desc: "Period trial balance." },
+      { tcode: "FiscalCal", name: "Fiscal Period Status", desc: "Period status and close indicators." }
+    ]
+  },
+  O2C: {
+    SAP_S4: [
+      { tcode: "VA05", name: "Sales Order List", desc: "All sales orders with customer and value." },
+      { tcode: "VL06", name: "Outbound Delivery List", desc: "Delivery documents for orders." },
+      { tcode: "FBL5N", name: "Customer Line Items", desc: "AR open/cleared items for aging." }
+    ],
+    SAP_ECC: [
+      { tcode: "VA05", name: "Sales Order List", desc: "All sales orders with customer and value." },
+      { tcode: "F.21", name: "AR DSO Report", desc: "Days Sales Outstanding analysis." },
+      { tcode: "FBL5N", name: "Customer Line Items", desc: "AR open/cleared items." }
+    ],
+    ORACLE_R12: [
+      { tcode: "AR_AGING", name: "Customer Aging Report", desc: "AR aging buckets by customer." },
+      { tcode: "OM_ORDERS", name: "Sales Order Summary", desc: "Order Management headers + lines." },
+      { tcode: "AR_DISP", name: "Dispute Aging", desc: "Disputed invoices and resolution status." }
+    ],
+    ORACLE_FUSION: [
+      { tcode: "OTBI: AR", name: "Customer Aging - 7 Buckets", desc: "Receivables aging by customer." },
+      { tcode: "OTBI: OM", name: "Order to Cash - Order Lines", desc: "Order lines with fulfillment status." },
+      { tcode: "OTBI: COL", name: "Collections Worklist", desc: "Open dispute and collection cases." }
+    ],
+    MS_DYNAMICS: [
+      { tcode: "CustAging", name: "Customer Aging List", desc: "Open AR by aging bucket." },
+      { tcode: "SalesTable", name: "Sales Order Status", desc: "Sales orders with status and dates." },
+      { tcode: "CustInvDispute", name: "Customer Disputes", desc: "Disputes / on-hold invoices." }
+    ]
+  },
+  ITGC: {
+    SAP_S4: [
+      { tcode: "SUIM", name: "User Information System", desc: "Users with roles, profiles, and assignment dates." },
+      { tcode: "SM20", name: "Security Audit Log", desc: "Critical user activity audit trail." },
+      { tcode: "STAD", name: "Workload Statistics", desc: "Transaction usage by user." }
+    ],
+    SAP_ECC: [
+      { tcode: "SUIM", name: "User Information System", desc: "Users with roles, profiles, and assignment dates." },
+      { tcode: "SM20", name: "Security Audit Log", desc: "Audit trail of critical actions." },
+      { tcode: "USR02/USR40", name: "User Master + Pwd Policy", desc: "User master and password configuration." }
+    ],
+    ORACLE_R12: [
+      { tcode: "FND_USER", name: "User-Responsibility Report", desc: "Users and their assigned responsibilities." },
+      { tcode: "FND_LOGINS", name: "Login Audit Report", desc: "Logon attempts and successes/failures." },
+      { tcode: "DBA_USERS", name: "DBA User Privileges", desc: "Database-level user privileges." }
+    ],
+    ORACLE_FUSION: [
+      { tcode: "OTBI: SEC", name: "Roles &amp; Privileges", desc: "User-role assignments via Security console." },
+      { tcode: "OTBI: AUD", name: "Audit Trail", desc: "Object-level audit events." },
+      { tcode: "OTBI: SoD", name: "Segregation of Duties Analysis", desc: "Conflicting role assignment matrix." }
+    ],
+    MS_DYNAMICS: [
+      { tcode: "SecRole", name: "Security Role Audit", desc: "User to security role assignments." },
+      { tcode: "SignInLog", name: "Sign-in Activity Log", desc: "Azure AD sign-in events." },
+      { tcode: "AuditTrail", name: "Database Audit Log", desc: "Data change audit." }
+    ]
+  }
+};
+
+function selectDomain(d, el) {
+  wizardState.domain = d;
+  document.querySelectorAll("#pane-1 .option-card").forEach(c => c.classList.remove("selected"));
+  el.classList.add("selected");
+  document.getElementById("step1-next").disabled = false;
+}
+function selectErp(e, el) {
+  wizardState.erp = e;
+  document.querySelectorAll("#pane-2 .option-card").forEach(c => c.classList.remove("selected"));
+  el.classList.add("selected");
+  document.getElementById("step2-next").disabled = false;
+}
+function goStep(n) {
+  for (let i = 1; i <= 6; i++) {
+    document.getElementById("pane-" + i).style.display = "none";
+    const stepEl = document.querySelector(`.step[data-step="${i}"]`);
+    stepEl.classList.remove("active", "done");
+    if (i < n) stepEl.classList.add("done");
+    else if (i === n) stepEl.classList.add("active");
+  }
+  document.getElementById("pane-" + n).style.display = "block";
+  if (n === 3) renderReports();
+}
+function renderReports() {
+  const list = document.getElementById("report-list");
+  const reports = REPORTS_BY_ERP[wizardState.domain][wizardState.erp];
+  wizardState.totalRequired = reports.length;
+  wizardState.uploaded = 0;
+  document.getElementById("step3-help").textContent =
+    `For ${labelDomain(wizardState.domain)} from ${labelErp(wizardState.erp)}, please download and upload the ${reports.length} standard reports below.`;
+  list.innerHTML = "";
+  reports.forEach((r, i) => {
+    const div = document.createElement("div");
+    div.className = "report-card";
+    div.innerHTML = `
+      <div class="tcode">${r.tcode}</div>
+      <div class="info">
+        <h5>${r.name}</h5>
+        <p>${r.desc}</p>
+      </div>
+      <div class="actions">
+        <button class="upload-btn" id="up-${i}" onclick="simulateUpload(${i})">Upload File</button>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+  document.getElementById("step3-next").disabled = true;
+}
+function labelDomain(d) { return { R2R: "Record to Report", O2C: "Order to Cash", ITGC: "ITGC" }[d]; }
+function labelErp(e) { return { SAP_S4: "SAP S/4HANA", SAP_ECC: "SAP ECC 6.0", ORACLE_R12: "Oracle EBS R12", ORACLE_FUSION: "Oracle Fusion", MS_DYNAMICS: "MS Dynamics 365" }[e]; }
+function simulateUpload(i) {
+  const btn = document.getElementById("up-" + i);
+  btn.textContent = "Uploading...";
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.textContent = "✓ Uploaded";
+    btn.classList.add("done");
+    btn.parentElement.parentElement.classList.add("uploaded");
+    wizardState.uploaded++;
+    if (wizardState.uploaded >= wizardState.totalRequired) {
+      document.getElementById("step3-next").disabled = false;
+    }
+  }, 900);
+}
+
+// ====== AI mapping ======
+const SAMPLE_MAPPING = {
+  R2R: [
+    { src: "Document Number", tgt: "doc_number", conf: "high" },
+    { src: "Posting Date", tgt: "posting_date", conf: "high" },
+    { src: "Document Date", tgt: "document_date", conf: "high" },
+    { src: "Account", tgt: "gl_account", conf: "high" },
+    { src: "Amount in local currency", tgt: "amount_local", conf: "high" },
+    { src: "Currency", tgt: "currency_code", conf: "high" },
+    { src: "User Name", tgt: "posted_by_user", conf: "high" },
+    { src: "Reference", tgt: "reference_text", conf: "med" },
+    { src: "Tx Code", tgt: "transaction_code", conf: "med" },
+    { src: "Reverse Doc", tgt: "reversal_doc_number", conf: "high" },
+  ],
+  O2C: [
+    { src: "Sales Document", tgt: "sales_order_id", conf: "high" },
+    { src: "Sold-to party", tgt: "customer_id", conf: "high" },
+    { src: "Created on", tgt: "order_date", conf: "high" },
+    { src: "Net Value", tgt: "order_amount", conf: "high" },
+    { src: "Document Status", tgt: "order_status", conf: "med" },
+    { src: "Currency", tgt: "currency_code", conf: "high" },
+    { src: "Delivery", tgt: "delivery_id", conf: "high" },
+    { src: "Credit limit", tgt: "credit_limit", conf: "med" },
+  ],
+  ITGC: [
+    { src: "User", tgt: "user_id", conf: "high" },
+    { src: "Role Name", tgt: "role_name", conf: "high" },
+    { src: "Profile Name", tgt: "profile_name", conf: "high" },
+    { src: "Valid From", tgt: "role_valid_from", conf: "high" },
+    { src: "Valid To", tgt: "role_valid_to", conf: "high" },
+    { src: "Last Logon", tgt: "last_login", conf: "high" },
+    { src: "User Group", tgt: "user_group", conf: "med" },
+    { src: "Locked", tgt: "is_locked", conf: "high" },
+  ]
+};
+const TARGET_FIELDS = {
+  R2R: ["doc_number","posting_date","document_date","gl_account","amount_local","amount_usd","currency_code","posted_by_user","reference_text","transaction_code","reversal_doc_number","entry_type","fiscal_period","approver_count"],
+  O2C: ["sales_order_id","customer_id","order_date","order_amount","order_status","currency_code","delivery_id","credit_limit","invoice_id","aging_bucket","dispute_flag","payment_term"],
+  ITGC: ["user_id","role_name","profile_name","role_valid_from","role_valid_to","last_login","user_group","is_locked","sod_conflict_flag","privileged_flag","department"]
+};
+
+function runAiMapping() {
+  goStep(4);
+  const status = document.getElementById("ai-status");
+  const sub = document.getElementById("ai-substatus");
+  const prog = document.getElementById("ai-progress");
+  const result = document.getElementById("mapping-result");
+  const loader = document.getElementById("ai-loader-block");
+  result.style.display = "none"; loader.style.display = "block";
+  const stages = [
+    ["Inspecting file structure...", "Detected 14,287 rows across 3 files. Reading headers and inferring data types."],
+    ["Matching against trained ERP report templates...", "Comparing column signature with 84 known SAP/Oracle/D365 report patterns."],
+    ["Identified template: FBL3N v9.x (SAP S/4HANA)", "Confidence: 96%. Loading column-to-target mapping rules."],
+    ["Generating field-level mapping with confidence scoring...", "Running embedding similarity + heuristic rules across 14 target fields."],
+    ["Validating data types and value distributions...", "Cross-checking date formats, currency codes, and key uniqueness."],
+    ["Mapping ready for review", "94% of fields auto-mapped at high confidence."]
+  ];
+  let i = 0;
+  const tick = setInterval(() => {
+    if (i < stages.length) {
+      status.textContent = stages[i][0];
+      sub.textContent = stages[i][1];
+      prog.style.width = (((i + 1) / stages.length) * 100) + "%";
+      i++;
+    } else {
+      clearInterval(tick);
+      setTimeout(() => {
+        loader.style.display = "none";
+        result.style.display = "block";
+        renderMapping();
+      }, 400);
+    }
+  }, 700);
+}
+
+function renderMapping() {
+  const tbody = document.getElementById("mapping-tbody");
+  const m = SAMPLE_MAPPING[wizardState.domain] || SAMPLE_MAPPING.R2R;
+  const targets = TARGET_FIELDS[wizardState.domain] || TARGET_FIELDS.R2R;
+  tbody.innerHTML = "";
+  m.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><code>${row.src}</code></td>
+      <td>→</td>
+      <td>
+        <select>
+          ${targets.map(t => `<option value="${t}" ${t === row.tgt ? "selected" : ""}>${t}</option>`).join("")}
+          <option value="">-- ignore column --</option>
+        </select>
+      </td>
+      <td><span class="confidence ${row.conf}">${row.conf === "high" ? "98%" : row.conf === "med" ? "72%" : "45%"}</span></td>
+      <td><button class="btn btn-ghost" style="padding:4px 10px; font-size:11.5px;">Override</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+  const file = wizardState.domain === "O2C" ? "VA05_Apr2026.xlsx" : wizardState.domain === "ITGC" ? "SUIM_UserRoles.csv" : "FBL3N_Apr2026.csv";
+  document.getElementById("mapping-file").textContent = file;
+  document.getElementById("confirm-files").textContent = wizardState.totalRequired;
+}
+
+function confirmPush() {
+  goStep(6);
+}
+function resetWizard() {
+  wizardState = { domain: null, erp: null, uploaded: 0, totalRequired: 0 };
+  goStep(1);
+  document.querySelectorAll(".option-card").forEach(c => c.classList.remove("selected"));
+  document.getElementById("step1-next").disabled = true;
+  document.getElementById("step2-next").disabled = true;
+}
+
+// ====== KRI Library ======
+function renderLibrary(filter) {
+  const tbody = document.getElementById("library-body");
+  tbody.innerHTML = "";
+  const all = [];
+  Object.keys(KRIs).forEach(d => KRIs[d].forEach(k => all.push({ ...k, domain: d })));
+  const list = filter === "all" ? all : all.filter(k => k.domain === filter);
+  list.forEach(k => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><strong>${k.name}</strong><br><span style="font-size:11.5px; color:var(--gray-600);">${k.desc}</span></td>
+      <td><span class="confidence ${k.domain === 'R2R' ? 'med' : k.domain === 'O2C' ? 'high' : 'low'}">${k.domain}</span></td>
+      <td><code>${k.threshold}</code></td>
+      <td>Daily</td>
+      <td style="font-size:11.5px;">${k.reports}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+function filterLib(f, btn) {
+  document.querySelectorAll("#page-library .tab").forEach(t => t.classList.remove("active"));
+  btn.classList.add("active");
+  renderLibrary(f);
+}
+
+// ====== Drill-down modal ======
+function openDrill(k) {
+  document.getElementById("dd-title").textContent = k.name;
+  document.getElementById("dd-sub").textContent = `Threshold: ${k.threshold} · Frequency: Daily`;
+  const banner = document.getElementById("dd-banner");
+  banner.innerHTML = `<div class="alert-banner ${k.flag === 'red' ? 'warn' : k.flag === 'amber' ? 'info' : 'success'}">${k.flag === 'red' ? '🚨 Red threshold breached. Investigation recommended.' : k.flag === 'amber' ? '⚠️ Approaching red threshold. Monitor closely.' : '✓ Within green threshold.'}</div>`;
+  document.getElementById("dd-stats").innerHTML = `
+    <div class="detail-stat-box"><div class="l">Current</div><div class="v">${k.value}</div></div>
+    <div class="detail-stat-box"><div class="l">30-day Avg</div><div class="v">${k.spark[Math.floor(k.spark.length/2)]}</div></div>
+    <div class="detail-stat-box"><div class="l">Threshold</div><div class="v" style="font-size:14px;">${k.threshold}</div></div>
+  `;
+  // Outliers - synthetic
+  const out = document.getElementById("dd-outliers");
+  out.innerHTML = `
+    <thead><tr><th>ID</th><th>Date</th><th>User</th><th>Value</th><th>Flag</th></tr></thead>
+    <tbody>
+      <tr><td>JE-204871</td><td>2026-05-03 (Sun)</td><td>jhall</td><td>$420,000</td><td class="flag-red">RED</td></tr>
+      <tr><td>JE-204902</td><td>2026-05-04 (Mon 02:14)</td><td>mlopez</td><td>$284,500</td><td class="flag-red">RED</td></tr>
+      <tr><td>JE-204940</td><td>2026-05-04 (Sun)</td><td>aroth</td><td>$95,200</td><td class="flag-red">RED</td></tr>
+      <tr><td>JE-204955</td><td>2026-05-05 (Sat)</td><td>jhall</td><td>$48,000</td><td class="flag-red">RED</td></tr>
+    </tbody>
+  `;
+  document.getElementById("dd-logic").innerHTML = `
+    <strong>Source reports:</strong> ${k.reports}<br><br>
+    <strong>Logic:</strong><br><code>${k.logic}</code>
+  `;
+  document.getElementById("drilldown").classList.add("active");
+  setTimeout(() => makeDrillChart(k), 100);
+}
+function closeDrill() { document.getElementById("drilldown").classList.remove("active"); }
+
+let ddChartInstance = null;
+function makeDrillChart(k) {
+  if (ddChartInstance) ddChartInstance.destroy();
+  const ctx = document.getElementById("ddChart").getContext("2d");
+  const days = 30;
+  const data = Array.from({ length: days }, (_, i) => {
+    const base = k.spark[k.spark.length - 1];
+    return base * (0.7 + Math.sin(i / 4) * 0.15 + Math.random() * 0.2);
+  });
+  ddChartInstance = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: Array.from({ length: days }, (_, i) => "D" + (i + 1)),
+      datasets: [{
+        data, label: k.name, fill: true,
+        borderColor: k.flag === "red" ? "#ef4444" : k.flag === "amber" ? "#f59e0b" : "#10b981",
+        backgroundColor: k.flag === "red" ? "rgba(239,68,68,0.1)" : k.flag === "amber" ? "rgba(245,158,11,0.1)" : "rgba(16,185,129,0.1)",
+        tension: 0.35, pointRadius: 0
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: false }, x: { ticks: { maxTicksLimit: 6 } } }
+    }
+  });
+}
+
+// ====== Initial charts ======
+window.addEventListener("DOMContentLoaded", () => {
+  // Trend chart
+  new Chart(document.getElementById("trendChart"), {
+    type: "line",
+    data: {
+      labels: ["W1","W2","W3","W4","W5","W6","W7","W8","W9","W10","W11","W12"],
+      datasets: [
+        { label: "R2R Risk Index", data: [22,25,30,28,32,40,38,45,50,52,55,58], borderColor: "#ef4444", tension: 0.4, pointRadius: 0 },
+        { label: "O2C Risk Index", data: [42,40,38,36,35,38,41,43,45,46,48,50], borderColor: "#f59e0b", tension: 0.4, pointRadius: 0 },
+        { label: "ITGC Risk Index", data: [60,58,62,64,66,68,72,70,73,75,78,80], borderColor: "#0ea5e9", tension: 0.4, pointRadius: 0 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: "top" } },
+      scales: { y: { beginAtZero: true, max: 100 } }
+    }
+  });
+
+  renderTiles("R2R", "r2r-tiles");
+  renderTiles("O2C", "o2c-tiles");
+  renderTiles("ITGC", "itgc-tiles");
+
+  new Chart(document.getElementById("r2rChart"), {
+    type: "bar",
+    data: {
+      labels: Array.from({length: 12}, (_, i) => "Wk" + (i + 1)),
+      datasets: [{ label: "Weekend journals", data: [12,18,22,15,10,17,21,28,32,40,45,47],
+        backgroundColor: ["#10b981","#10b981","#10b981","#10b981","#10b981","#10b981","#f59e0b","#f59e0b","#f59e0b","#ef4444","#ef4444","#ef4444"] }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+  });
+
+  new Chart(document.getElementById("o2cChart"), {
+    type: "line",
+    data: {
+      labels: Array.from({length: 90}, (_, i) => "D" + (i + 1)),
+      datasets: [{ label: "DSO", data: Array.from({length:90}, (_,i) => 45 + i*0.08 + Math.sin(i/6) * 2),
+        borderColor: "#f59e0b", backgroundColor: "rgba(245,158,11,0.1)", fill: true, pointRadius: 0, tension: 0.3 }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { maxTicksLimit: 9 } } } }
+  });
+
+  new Chart(document.getElementById("itgcChart"), {
+    type: "bar",
+    data: {
+      labels: Array.from({length: 24*7}, (_, i) => i % 24 === 0 ? "D" + Math.floor(i / 24 + 1) : ""),
+      datasets: [{ label: "Privileged actions", data: Array.from({length: 24*7}, (_,i) => {
+        const hour = i % 24;
+        const isOff = hour < 7 || hour > 19;
+        return isOff ? Math.random() * 12 + 2 : Math.random() * 5 + 1;
+      }), backgroundColor: Array.from({length: 24*7}, (_,i) => {
+        const hour = i % 24;
+        return (hour < 7 || hour > 19) ? "#ef4444" : "#0ea5e9";
+      }) }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+  });
+});
+
+</script>
+
+</body>
+</html>
